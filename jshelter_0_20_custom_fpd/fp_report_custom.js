@@ -24,7 +24,7 @@
 
 let hiddenTraces = {};
 
-var tabId = ""
+var customTabId = ""
 
 /**
  * The function that populates FPD report page with data from the latest evaluation and hooks up listeners.
@@ -61,7 +61,7 @@ function exportReportCustom() {
 function refreshReportCustom() {
 	browser.runtime.sendMessage({
 		purpose: "fpd-get-report-data",
-		tabId: tabId
+		tabId: customTabId
 	}).then((result) => {
 		createReportCustom(result);
 	});
@@ -70,9 +70,7 @@ function refreshReportCustom() {
 }
 
 function trackCallersCustom(id) {
-	fpd_track_callers_tab = id
-	function onReloaded() {
-		setTimeout(refreshReportCustom, 5000);
-	}
-	onReloaded();
+	fpd_track_callers_tab = id;
+	customTabId = id;
+	setTimeout(refreshReportCustom, 5000);
 }

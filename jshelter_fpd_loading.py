@@ -15,7 +15,7 @@ HEADLESS = "HEADLESS"
 ERROR_PAGES = ["https://facebook.com", "https://firmy.cz", "https://zalando.cz", "https://pons.com"]
 
 # List of pages where 0.19 tracks correctly but 0.20 does not
-PAGES_WORKING_WITH_PREVIOUS = ["https://novinky.cz", "https://vut.cz"]
+PAGES_WORKING_WITH_PREVIOUS = ["https://novinky.cz", "https://tiktok.com", "https://vut.cz"]
 
 def setup_jshelter_custom_fpd(options: dict, download_path: str) -> webdriver.Chrome:
 
@@ -25,7 +25,6 @@ def setup_jshelter_custom_fpd(options: dict, download_path: str) -> webdriver.Ch
     chrome_options.add_argument('--enable-extensions')
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument("--allow-running-insecure-content")
-    chrome_options.add_argument("--disable-cache")
 
     if options.get(HEADLESS):
         chrome_options.add_argument("--headless=new")
