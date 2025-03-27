@@ -94,5 +94,5 @@ for page in PAGES_WORKING_WITH_PREVIOUS[:1]:
 
     print(f"Visiting page {page}")
     driver_with_fpd.get(page)
-    time.sleep(20)
+    time.sleep(100)
     driver_with_fpd.quit()
