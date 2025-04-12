@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% set title = page.title %}
+
+{% block content %}
+<article class="hentry page">
+  <header>
+  {% block title %}
+    <h2 class="entry-title">{{ page.title }}</h2>
+  {% endblock %}
+  </header>
+
+  <div class="entry-content">
+    {{ page.content }}
+  </div>
+
+  {% if page.slug == 'levels' %}
+  <ul>
+    <h2>Available wrappers</h2>
+    {% for p in pages if p.category == "wrappers" %}
+    {% if p.url.strip('/') == slug %}
+    <li class="active">
+      {% else %}
+    <li>
+      {% endif %}
+      <a href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {# source link #}
+  {% if page.category == "wrappers" %}
+  <div class="source-link">
+    <p>See this wrapper's <a href="/doxygen/wrappingS-{{ page.slug|upper }}_8js.html" target="_blank">technical docs</a> and <a href="https://pagure.io/JShelter/webextension/blob/main/f/common/wrappingS-{{ page.slug|upper }}.js">source code</a> for more.</p>
+  </div>
+  {% endif %}
+</article>
+{% endblock %}

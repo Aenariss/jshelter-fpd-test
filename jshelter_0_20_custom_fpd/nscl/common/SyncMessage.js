@@ -72,6 +72,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
         } else {
           retries.add(retryKey);
         }
+        console.debug(`SyncMessage retry ${retried ? "(giving up)" : "now" }.`, retryKey); // DEV_ONLY
         return Promise.resolve(!retried);
       }
       if (wrapper.release) {
@@ -159,7 +160,9 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
       USE_SERVICE_WORKER
       ? new Suspender(function() {
         // MV3 with service worker
+        console.debug("Registering sw fetch listener"); // DEV_ONLY
         addEventListener("fetch", event => {
+          console.debug("Extension sw fetch event", event); // DEV_ONLY
           const msgId = url2MsgId(event.request.url);
           if (!msgId) return;
           const wrapper = this.get(msgId);
@@ -207,6 +210,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
                 },
               };
 
+              console.debug("Creating rule ", rule); // DEV_ONLY
 
               addRules.push(rule);
               const method = `update${ruleSet}Rules`;
@@ -309,6 +313,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
                   const r = resultReady
                     ? asyncRet(msgId) // promise was already resolved
                     : LOOP_RET;
+                  console.debug("SyncMessage XHR->webRequest %s returning %o", shortUrl, r, request); // DEV_ONLY
                   return r;
                 };
 
@@ -318,6 +323,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
 
                 const wrapper = this.get(msgId);
 
+                console.debug(`PENDING ${shortUrl}: ${JSON.stringify(wrapper)}`, request); // DEV_ONLY
                 if (!wrapper) {
                   return anyMessageYet
                     ? CANCEL // cannot reconcile with any pending message, abort
@@ -470,6 +476,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
           }
         );
 
+    console.debug("Using suspender", suspender, USE_SERVICE_WORKER); // DEV_ONLY
 
     browser.runtime.onSyncMessage = Object.freeze({
       BASE_PREFIX,
@@ -501,6 +508,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
           const allowingValue = allowSyncXhr(f.allow);
           if (f.allow != allowingValue) {
             f.allow = allowingValue;
+            console.debug("Allowing Sync XHR on ", f, f.allow); // DEV_ONLY
             f.src = f.src;
           }
         }
@@ -573,6 +581,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
               );
               throw new Error("Too many SyncMessage loops!");
             }
+            console.debug(`SyncMessage ${msgId} waiting for main process asynchronous processing, loop ${loop}/${MAX_LOOPS}.`); // DEV_ONLY
             continue;
           } else if (result.error) {
             result.error = new Error(result.error.message + ` (${url})`, result.error);
@@ -588,6 +597,7 @@ if (!["onSyncMessage", "sendSyncMessage"].some((m) => browser.runtime[m])) {
         break;
       }
       preSend({ id: msgId, release: true });
+      console.debug(`SyncMessage ${msgId}, state ${ document.readyState }, result: ${JSON.stringify(result)}`); // DEV_ONLY
       if (result.error) {
         if (document.featurePolicy && !document.featurePolicy?.allowsFeature("sync-xhr")) {
           throw new Error(`SyncMessage fails on ${document.URL} because sync-xhr is not allowed!`);

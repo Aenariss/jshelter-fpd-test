@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <article class="hentry post">
+      {% set title = article.title %}
+      <header>
+      {% block title %}
+        <h2 class="entry-title">{{ article.title }}</h2>
+        <p class="entry-date">
+          <time class="published" datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }}</time>
+        </p>
+      {% endblock %}
+      </header>
+
+      <div class="entry-content">
+        {{ article.content }}
+
+        {# source link #}
+        {# <p><a href="{{ page.relPath }}{{ compound.sourceFileName }}{{ config.HTML_FILE_EXTENSION }}">{{ tr.gotoSourceCode }}</a></p> #}
+      </div>
+
+      {% if article.series %}
+        <footer>
+            <p>This post is part {{ article.series.index }} of the "{{ article.series.name }}" series:</p>
+            <ol class="parts">
+                {% for part_article in article.series.all %}
+                    <li {% if part_article == article %}class="active"{% endif %}>
+                        <a href='{{ SITEURL }}/{{ part_article.url }}'>{{ part_article.title }}</a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </footer>
+      {% endif %}
+  </article>
+{% endblock %}

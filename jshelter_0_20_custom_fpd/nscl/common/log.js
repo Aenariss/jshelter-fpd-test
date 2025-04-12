@@ -38,6 +38,7 @@
       const sinceStartup = ts - startupTime;
       const elapsed = ts - lastDebugTime;
       lastDebugTime = ts;
+      console.debug(`${PREFIX}(#${ordinal++},${elapsed},${sinceStartup}): ${msg}`, ...rest, getStack());
     },
     error(e, msg, ...rest) {
       console.error(e, `${PREFIX} ${msg}`, ...rest, getStack());

@@ -65,6 +65,7 @@ function patchWindow(patchingCallback, env = {}) {
   const { dispatchEvent, addEventListener } = self;
 
   function Port(from, to) {
+    console.debug(`Creating ${from}->${to} port ${portId}`); // DEV_ONLY
     if (!self.document) {
       // ServiceWorker scope, dummy port, won't be used.
       this.postMessage = () => {};
@@ -107,6 +108,7 @@ function patchWindow(patchingCallback, env = {}) {
   }
   let port = new Port("extension", "page");
   if (patchWindow.disabled) {
+    console.debug("patchWindow disabled."); // DEV_ONLY
     return port;
   }
   if (justPort) {
@@ -250,6 +252,7 @@ function patchWindow(patchingCallback, env = {}) {
           return actualTarget.apply(thisArg, args);
         } catch (e) {
           if (isZombieException(e)) {
+            console.debug(`Zombie hit for "${method}", falling back to native wrapper...`);
             return (actualTarget = (wrappedObj || XPCNativeWrapper(obj))[method]).apply(thisArg, args);
           }
           throw e;
@@ -323,6 +326,7 @@ function patchWindow(patchingCallback, env = {}) {
     // auto-trigger window patching whenever new elements are added to the DOM
     let patchAll = () => {
       if (patchWindow.disabled) {
+        console.debug("patchWindow disabled: disconnecting MutationObserver."); // DEV_ONLY
         observer.disconnect();
       }
       for (let j = 0; j in window; j++) {

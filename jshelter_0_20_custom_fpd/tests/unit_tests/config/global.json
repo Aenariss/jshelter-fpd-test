@@ -1,0 +1,754 @@
+{
+	"scripts": [
+		{
+			"name": "helpers",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+			],
+			"inject_code_to_src": {
+				"begin": "var tld = {getDomain: (d) => 'TLD#' + d};"
+			},
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./helpers.js",
+							"objects": [
+								"escape",
+								"byteToHex",
+								"gen_random32",
+								"gen_random64",
+								"getEffectiveDomain",
+								"getSiteForURL",
+								"create_short_text"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "url",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./url.js",
+							"objects": [
+								"extractSubDomains"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "levels",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"import": "sinon-chrome",
+							"as": "browser"
+						},
+						{
+							"import": "navigator",
+							"as": "navigator"
+						},
+						{
+							"import": "window",
+							"as": "window"
+						},
+						{
+							"from": "./url.js",
+							"objects": [
+								"extractSubDomains"
+							]
+						},
+						{
+							"from": "./helpers.js",
+							"objects": [
+								"getEffectiveDomain"
+							]
+						}
+					]
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./levels.js",
+							"objects": [
+								"wrapping_groups",
+								"is_api_undefined",
+								"are_all_api_unsupported",
+								"level_0",
+								"level_1",
+								"level_2",
+								"level_3",
+								"levels",
+								"default_level",
+								"domains",
+								"wrapped_codes",
+								"init_levels",
+								"updateLevels",
+								"changedLevels",
+								"setDefaultLevel",
+								"saveDomainLevels",
+								"getCurrentLevelJSON"
+							]
+						},
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"wrap_code"
+							]
+						}
+					]
+				}
+			],
+			"replace_in_src": [
+				{
+					"origin": "browser.storage.sync.get(null).then(updateLevels);",
+					"new": "browser.storage.sync.get(null);"
+				}
+			],
+			"inject_code_to_src": 
+			{
+				"begin": "function gen_random32() { return 0.2 * 4294967295; }",
+				"end": "domains = {}; domains['stackoverflow.com'] = level_3; domains['polcak.github.io'] = level_2; domains['github.io'] = level_3; domains['swatblog.rtgp.xyz'] = level_1; domains['mail.google.com'] = level_0; domains['example.net'] = level_3; domains['vas-hosting.cz'] = level_2; domains['crm4.dynamics.com'] = level_1; domains['dynamics.com'] = level_2; domains['csob.cz'] = level_0;"
+			}
+		},
+		{
+			"name": "code_builders",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"build_wrapping_code"
+							]
+						},
+						{
+							"import": "sinon-chrome",
+							"as": "sinon_browser"
+						},
+						{
+							"import": "fs",
+							"as": "fs"
+						},
+						{
+							"files": [
+								"../../wasm/build/release.wasm"
+							]
+						}
+					]
+				}
+			],
+			"inject_code_to_src": {
+				"begin": "var browser = JSON.parse(JSON.stringify(sinon_browser)); browser.runtime.getURL = function(){return 'tmp/release.wasm';}; fetch = fs.readFileSync; WebAssembly.instantiateStreaming = WebAssembly.instantiate;"
+			},
+			"replace_in_src": [
+				{
+					"origin": "Object.freeze(wasm);",
+					"new": ""
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"enclose_wrapping",
+								"enclose_wrapping2",
+								"define_page_context_function",
+								"generate_assign_function_code",
+								"generate_object_properties",
+								"generate_delete_properties",
+								"build_code",
+								"wrap_code",
+								"insert_wasm_code"
+							]
+						},
+						{
+							"from": "./levels.js",
+							"objects": [
+								"levels",
+								"wrapping_groups"
+							]
+						},
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"crc16_table"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "wrapping",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"build_wrapping_code",
+								"add_wrappers",
+								"rounding_function",
+								"noise_function"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "background",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./levels.js",
+							"objects": [
+								"getCurrentLevelJSON"
+							]
+						},
+						{
+							"from": "./fp_detect_background.js",
+							"objects": [
+								"fpDb"
+							]
+						},
+						{
+							"import": "sinon-chrome",
+							"as": "browser"
+						}
+					]
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./background.js",
+							"objects": [
+								"build_wrapping_code",
+								"add_wrappers",
+								"rounding_function",
+								"noise_function"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "fp_detect_background",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./helpers.js",
+							"objects": [
+								"Observable"
+							]
+						},
+						{
+							"import": "sinon-chrome",
+							"as": "browser"
+						}
+					]
+				}
+			],
+			"test_script_requirements": []
+		},
+		{
+			"name": "alea",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [],
+			"test_script_requirements": [],
+			"inject_code_to_src": {
+				"begin": "domainHash = '0000000000000000';",
+				"end": "eval(alea);"
+			}
+		},
+		{
+			"name": "crc16",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"crc16"
+							]
+						},
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"insert_wasm_code"
+							]
+						}
+					]
+				}
+			],
+			"inject_code_to_src": {
+				"end": "eval(crc16);"
+			}
+		},
+		{
+			"name": "wrappingS-GEO",
+			"remove_custom_namespace": true,
+			"let_to_var": true,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						},
+						{
+							"from": "./alea.js",
+							"objects": [
+								"alea"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"processOriginalGPSDataObject_globals",
+				"spoofCall",
+				"processOriginalGPSDataObject",
+				"setArgs",
+				"wrappers"
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrappingS-GEO.js",
+							"objects": [
+								"processOriginalGPSDataObject_globals",
+								"processOriginalGPSDataObject",
+								"wrappers"
+							]
+						},
+						{
+							"from": "./alea.js",
+							"objects": [
+								"alea"
+							]
+						}
+					]
+				}
+			],
+			"replace_in_src": [
+				{
+					"origin": "spoofPos(previouslyReturnedCoords);",
+					"new": "return spoofPos(previouslyReturnedCoords);"
+				},
+				{
+					"origin": "spoofCall(pos, originalPositionObject, successCallback);",
+					"new": "return spoofCall(pos, originalPositionObject, successCallback);"
+				},
+				{
+					"origin": "function processOriginalGPSDataObject(expectedMaxAge, originalPositionObject) {",
+					"new": "function processOriginalGPSDataObject(expectedMaxAge, originalPositionObject, desiredAccuracy) {"
+				}
+			],
+			"inject_code_to_src":
+			{
+				"begin": "function gen_random32() { return 0.2 * 4294967295; } function successCallback(arg) { return arg; } WrapHelper = { XRAY: false, shared: {}, forPage: function(param) {return param}, isForPage: obj => pageReady.has(obj), defineProperty: Object.defineProperty, defineProperties: Object.defineProperties, create: Object.create, a: 1, OriginalProxy: Proxy, Proxy: Proxy };"
+			}
+		},
+		{
+			"name": "http_shield_common",
+			"remove_custom_namespace": false,
+			"let_to_var": true,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"import": "sinon-chrome",
+							"as": "sinon_browser"
+						}
+					]
+				}
+			],
+			"extra_exports": [
+			],
+			"test_script_requirements": [
+			],
+			"inject_code_to_src":
+			{
+				"begin": "var browser = JSON.parse(JSON.stringify(sinon_browser)); browser.storage.sync.get = function(param) { return Promise.resolve(param); }; browser.runtime.onMessage.addListener = function(){return;}; browser.runtime.getURL = function(){return;};"
+			}
+		},
+		{
+			"name": "wrappingS-ECMA-SHARED",
+			"remove_custom_namespace": true,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"proxyHandler",
+				"wrappingFunctionBody",
+				"wrappers"
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrappingS-ECMA-SHARED.js",
+							"objects": [
+								"proxyHandler",
+								"wrappingFunctionBody",
+								"wrappers"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "wrappingS-ECMA-ARRAY",
+			"remove_custom_namespace": true,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"packIEEE754",
+				"unpackIEEE754",
+				"unpackF64",
+				"packF64",
+				"unpackF32",
+				"packF32",
+				"constructDecorator",
+				"offsetDecorator",
+				"redefineNewArrayFunctions",
+				"redefineNewArrayConstructors",
+				"proxyHandler",
+				"getByteDecorator",
+				"setByteDecorator",
+				"getFloatDecorator",
+				"setFloatDecorator",
+				"getBigIntDecorator",
+				"setBigIntDecorator",
+				"redefineDataViewFunctions"
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrappingS-ECMA-ARRAY.js",
+							"objects": [
+								"packIEEE754",
+								"unpackIEEE754",
+								"unpackF64",
+								"packF64",
+								"unpackF32",
+								"packF32",
+								"constructDecorator",
+								"offsetDecorator",
+								"redefineNewArrayFunctions",
+								"redefineNewArrayConstructors",
+								"proxyHandler",
+								"getByteDecorator",
+								"setByteDecorator",
+								"getFloatDecorator",
+								"setFloatDecorator",
+								"getBigIntDecorator",
+								"setBigIntDecorator",
+								"redefineDataViewFunctions"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "wrappingL-CANVAS",
+			"remove_custom_namespace": false,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./alea.js",
+							"objects": [
+								"alea"
+							]
+						},
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"CRC16"
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "wrappingS-WEBGL",
+			"remove_custom_namespace": true,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						},
+						{
+							"from": "./helpers.js",
+							"objects": [
+								"randomString"
+							]
+						},
+						{
+							"from": "./wrappingL-CANVAS.js",
+							"objects": [
+								"farbleCanvasDataBrave"
+							]
+						}
+					]
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"insert_wasm_code"
+							]
+						},
+						{
+							"from": "./wrappingS-WEBGL.js",
+							"objects": [
+								"farblePixels"
+							]
+						},
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"crc16_table"
+							]
+						},
+						{
+							"from": "./alea.js",
+							"objects": [
+								"Mash"
+							]
+						},
+						{
+							"from": "./wrappingL-CANVAS.js",
+							"objects": [
+								"farbleCanvasDataBrave"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"farblePixels"
+			]
+		},
+		{
+			"name": "wrappingS-WEBA",
+			"remove_custom_namespace": true,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						}
+					]
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"insert_wasm_code"
+							]
+						},
+						{
+							"from": "./wrappingS-WEBA.js",
+							"objects": [
+								"audioFarble",
+								"audioFarbleInt"
+							]
+						},
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"crc16_table",
+								"CRC16"
+							]
+						},
+						{
+							"from": "./alea.js",
+							"objects": [
+								"alea",
+								"Mash"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"audioFarble",
+				"audioFarbleInt"
+			]
+		},
+		{
+			"name": "wrappingS-H-C",
+			"remove_custom_namespace": true,
+			"let_to_var": false,
+			"src_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./wrapping.js",
+							"objects": [
+								"add_wrappers"
+							]
+						},
+						{
+							"from": "./wrappingL-CANVAS.js",
+							"objects": [
+								"farbleCanvasDataBrave"
+							]
+						}
+					]
+				}
+			],
+			"test_script_requirements": [
+				{
+					"type": "const",
+					"requirements": [
+						{
+							"from": "./code_builders.js",
+							"objects": [
+								"insert_wasm_code"
+							]
+						},
+						{
+							"from": "./wrappingS-H-C.js",
+							"objects": [
+								"wrappers"
+							]
+						},
+						{
+							"from": "./crc16.js",
+							"objects": [
+								"crc16_table",
+								"CRC16"
+							]
+						},
+						{
+							"from": "./alea.js",
+							"objects": [
+								"Mash",
+								"alea"
+							]
+						},
+						{
+							"from": "./wrappingL-CANVAS.js",
+							"objects": [
+								"farbleCanvasDataBrave"
+							]
+						}
+					]
+				}
+			],
+			"extra_exports": [
+				"wrappers"
+			]
+		}
+	]
+}

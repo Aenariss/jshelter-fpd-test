@@ -1,0 +1,92 @@
+{
+  "manifest_version": 3,
+  "default_locale": "en",
+  "name": "NoScript Commons Library",
+  "applications": {
+    "gecko": {
+      "id": "nscl@noscript.net",
+      "strict_min_version": "115.0"
+    }
+  },
+  "version": "1.0.1",
+
+  "permissions": [
+      "contextMenus",
+      "storage",
+      "tabs",
+      "unlimitedStorage",
+      "webNavigation",
+      "webRequest",
+      "webRequestBlocking",
+      "scripting",
+      "declarativeNetRequest",
+      "declarativeNetRequestFeedback",
+      "declarativeContent",
+      "debugger"
+  ],
+  "host_permissions": [
+      "<all_urls>"
+  ],
+
+  "background": {
+    "service_worker": "sw.js",
+    "scripts": [
+    "/lib/browser-polyfill.js",
+    "/lib/punycode.js",
+    "/common/UA.js",
+    "/common/uuid.js",
+    "/common/log.js",
+    "/common/locale.js",
+    "/common/tld.js",
+    "/common/Messages.js",
+    "/common/SyncMessage.js",
+    "/common/CSP.js",
+    "/common/CapsCSP.js",
+    "/common/NetCSP.js",
+    "/common/RequestKey.js",
+    "/common/Sites.js",
+    "/common/Permissions.js",
+    "/common/Policy.js",
+    "/common/Storage.js",
+    "/common/sha256.js",
+    "/service/TabCache.js",
+    "/common/include.js",
+    "/main.js"
+    ]
+  },
+
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "matches": ["<all_urls>"],
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "all_frames": true,
+      "js": [
+        "/lib/browser-polyfill.js",
+        "/common/uuid.js",
+        "/common/SyncMessage.js",
+        "/content/Worlds.js",
+	      "/content.js"
+      ]
+    },
+    {
+      "run_at": "document_start",
+      "matches": ["<all_urls>"],
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "all_frames": true,
+      "world": "MAIN",
+      "js": [
+        "/main/uuid.js",
+        "/main/Worlds.js",
+	      "/content.main.js"
+      ]
+    }
+  ],
+
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}
