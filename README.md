@@ -2,8 +2,8 @@
 Repository for testing the FPD functionality of JShelter.
 
 - ``./jshelter_0_19_custom_fpd/`` is a clone of the original 0.19 JShelter version.
-- ``./jshelter_0_20_custom_fpd/`` is a clone of the original 0.20 JShelter version.
-- ``./jshelter_0_20_custom_fpd.crx`` is the custom built version 0.20 in the .crx format.
+- ``./jshelter_0_20_2_custom_fpd/`` is a clone of the original 0.20 JShelter version.
+- ``./jshelter_0_20_2_custom_fpd.crx`` is the custom built version 0.20.2 in the .crx format.
 - ``./jshelter_0_19_custom_fpd.crx`` is the custom built version 0.19 in the .crx format.
 - ``./jshelter_fpd_loading.py`` is the testing script used to reproduce the issue.
 - ``./requirements.txt`` are Python requirements for the testing script (pip install -r requirements.txt)

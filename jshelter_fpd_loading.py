@@ -38,7 +38,7 @@ def setup_jshelter_custom_fpd(options: dict, download_path: str) -> webdriver.Ch
     })
 
     # Set-up JShelter FPD -- custom version, all shields are off, fpd is set on by default
-    chrome_options.add_extension("./jshelter_0_20_custom_fpd.crx")
+    chrome_options.add_extension("./jshelter_0_20_2_custom_fpd.crx")
 
 
     service = ChromeService.Service()
