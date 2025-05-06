@@ -29,8 +29,8 @@ def setup_jshelter_custom_fpd(options: dict, download_path: str) -> webdriver.Ch
     if options.get(HEADLESS):
         chrome_options.add_argument("--headless=new")
 
-    # Chrome 134
-    chrome_options.browser_version = "134"
+    # Chrome 136
+    chrome_options.browser_version = "136"
     chrome_options.add_experimental_option('prefs', {
         'download.default_directory': download_path,
         'download.prompt_for_download': False,
